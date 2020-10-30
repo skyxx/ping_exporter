@@ -33,13 +33,6 @@ func TestParseConfig(t *testing.T) {
 		t.FailNow()
 	}
 
-	if expected := 2*time.Minute + 15*time.Second; time.Duration(c.DNS.Refresh) != expected {
-		t.Errorf("expected dns.refresh to be %v, got %v", expected, c.DNS.Refresh)
-	}
-	if expected := "1.1.1.1"; c.DNS.Nameserver != expected {
-		t.Errorf("expected dns.nameserver to be %q, got %q", expected, c.DNS.Nameserver)
-	}
-
 	if expected := 2 * time.Second; time.Duration(c.Ping.Interval) != expected {
 		t.Errorf("expected ping.interval to be %v, got %v", expected, c.Ping.Interval)
 	}
