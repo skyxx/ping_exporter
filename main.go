@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/czerwonk/ping_exporter/config"
+	"github.com/skyxx/ping_exporter/config"
 	"github.com/digineo/go-ping"
 	mon "github.com/digineo/go-ping/monitor"
 
@@ -30,15 +30,8 @@ var (
 	pingTimeout   = kingpin.Flag("ping.timeout", "Timeout for ICMP echo request").Default("4s").Duration()
 	pingSize      = kingpin.Flag("ping.size", "Payload size for ICMP echo requests").Default("56").Uint16()
 	historySize   = kingpin.Flag("ping.history-size", "Number of results to remember per target").Default("10").Int()
-	dnsRefresh    = kingpin.Flag("dns.refresh", "Interval for refreshing DNS records and updating targets accordingly (0 if disabled)").Default("1m").Duration()
-	dnsNameServer = kingpin.Flag("dns.nameserver", "DNS server used to resolve hostname of targets").Default("").String()
 	logLevel      = kingpin.Flag("log.level", "Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal]").Default("info").String()
 	targets       = kingpin.Arg("targets", "A list of targets to ping").Strings()
-)
-
-var (
-	enableDeprecatedMetrics = true // default may change in future
-	deprecatedMetrics       = kingpin.Flag("metrics.deprecated", "Enable or disable deprecated metrics (`ping_rtt_ms{type=best|worst|mean|std_dev}`). Valid choices: [enable, disable]").Default("enable").String()
 )
 
 func init() {
@@ -55,15 +48,6 @@ func main() {
 	if err != nil {
 		log.Errorln(err)
 		os.Exit(1)
-	}
-
-	switch *deprecatedMetrics {
-	case "enable":
-		enableDeprecatedMetrics = true
-	case "disable":
-		enableDeprecatedMetrics = false
-	default:
-		kingpin.FatalUsage("metrics.deprecated must be `enable` or `disable`")
 	}
 
 	if mpath := *metricsPath; mpath == "" {
@@ -109,7 +93,6 @@ func printVersion() {
 }
 
 func startMonitor(cfg *config.Config) (*mon.Monitor, error) {
-	resolver := setupResolver(cfg)
 	var bind4,bind6 string
 	if ln, err := net.Listen("tcp4", "127.0.0.1:0"); err == nil {
                 //ipv4 enabled
@@ -151,31 +134,7 @@ func startMonitor(cfg *config.Config) (*mon.Monitor, error) {
 		}
 	}
 
-	go startDNSAutoRefresh(cfg.DNS.Refresh.Duration(), targets, monitor)
-
 	return monitor, nil
-}
-
-func startDNSAutoRefresh(interval time.Duration, targets []*target, monitor *mon.Monitor) {
-	if interval <= 0 {
-		return
-	}
-
-	for range time.NewTicker(interval).C {
-		refreshDNS(targets, monitor)
-	}
-}
-
-func refreshDNS(targets []*target, monitor *mon.Monitor) {
-	log.Infoln("refreshing DNS")
-	for _, t := range targets {
-		go func(ta *target) {
-			err := ta.addOrUpdateMonitor(monitor)
-			if err != nil {
-				log.Errorf("could refresh dns: %v", err)
-			}
-		}(t)
-	}
 }
 
 func startServer(monitor *mon.Monitor) {
@@ -215,21 +174,6 @@ func loadConfig() (*config.Config, error) {
 	return cfg, err
 }
 
-func setupResolver(cfg *config.Config) *net.Resolver {
-	if cfg.DNS.Nameserver == "" {
-		return net.DefaultResolver
-	}
-
-	if !strings.HasSuffix(cfg.DNS.Nameserver, ":53") {
-		cfg.DNS.Nameserver += ":53"
-	}
-	dialer := func(ctx context.Context, network, address string) (net.Conn, error) {
-		d := net.Dialer{}
-		return d.DialContext(ctx, "udp", cfg.DNS.Nameserver)
-	}
-	return &net.Resolver{PreferGo: true, Dial: dialer}
-}
-
 // addFlagToConfig updates cfg with command line flag values, unless the
 // config has non-zero values.
 func addFlagToConfig(cfg *config.Config) {
@@ -248,12 +192,6 @@ func addFlagToConfig(cfg *config.Config) {
 	if cfg.Ping.Size == 0 {
 		cfg.Ping.Size = *pingSize
 	}
-	if cfg.DNS.Refresh == 0 {
-		cfg.DNS.Refresh.Set(*dnsRefresh)
-	}
-	if cfg.DNS.Nameserver == "" {
-		cfg.DNS.Nameserver = *dnsNameServer
-	}
 }
 
 const indexHTML = `<!doctype html>
@@ -266,7 +204,7 @@ const indexHTML = `<!doctype html>
 	<h1>ping Exporter</h1>
 	<p><a href="%s">Metrics</a></p>
 	<h2>More information:</h2>
-	<p><a href="https://github.com/czerwonk/ping_exporter">github.com/czerwonk/ping_exporter</a></p>
+	<p><a href="https://github.com/skyxx/ping_exporter">github.com/skyxx/ping_exporter</a></p>
 </body>
 </html>
 `
