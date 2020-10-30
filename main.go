@@ -1,12 +1,10 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/skyxx/ping_exporter/config"
@@ -93,6 +91,7 @@ func printVersion() {
 }
 
 func startMonitor(cfg *config.Config) (*mon.Monitor, error) {
+   resolver := net.DefaultResolver
 	var bind4,bind6 string
 	if ln, err := net.Listen("tcp4", "127.0.0.1:0"); err == nil {
                 //ipv4 enabled
