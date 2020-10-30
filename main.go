@@ -19,16 +19,16 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const version string = "0.4.4"
+const version string = "0.7.0"
 
 var (
 	showVersion   = kingpin.Flag("version", "Print version information").Default().Bool()
 	listenAddress = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface").Default(":9427").String()
 	metricsPath   = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics").Default("/metrics").String()
 	configFile    = kingpin.Flag("config.path", "Path to config file").Default("").String()
-	pingInterval  = kingpin.Flag("ping.interval", "Interval for ICMP echo requests").Default("5s").Duration()
-	pingTimeout   = kingpin.Flag("ping.timeout", "Timeout for ICMP echo request").Default("4s").Duration()
-	pingSize      = kingpin.Flag("ping.size", "Payload size for ICMP echo requests").Default("56").Uint16()
+	pingInterval  = kingpin.Flag("ping.interval", "Interval for ICMP echo requests").Default("1s").Duration()
+	pingTimeout   = kingpin.Flag("ping.timeout", "Timeout for ICMP echo request").Default("2s").Duration()
+	pingSize      = kingpin.Flag("ping.size", "Payload size for ICMP echo requests").Default("64").Uint16()
 	historySize   = kingpin.Flag("ping.history-size", "Number of results to remember per target").Default("10").Int()
 	logLevel      = kingpin.Flag("log.level", "Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal]").Default("info").String()
 	targets       = kingpin.Arg("targets", "A list of targets to ping").Strings()
@@ -88,7 +88,7 @@ func main() {
 func printVersion() {
 	fmt.Println("ping-exporter")
 	fmt.Printf("Version: %s\n", version)
-	fmt.Println("Author(s): Philip Berndroth, Daniel Czerwonk")
+	fmt.Println("Author(s): Philip Berndroth, Daniel Czerwonk, SkyX")
 	fmt.Println("Metric exporter for go-icmp")
 }
 
@@ -113,9 +113,7 @@ func startMonitor(cfg *config.Config) (*mon.Monitor, error) {
 		pinger.SetPayloadSize(cfg.Ping.Size)
 	}
 
-	monitor := mon.New(pinger,
-		cfg.Ping.Interval.Duration(),
-		cfg.Ping.Timeout.Duration())
+	monitor := mon.New(pinger, cfg.Ping.Interval.Duration(), cfg.Ping.Timeout.Duration())
 	monitor.HistorySize = cfg.Ping.History
 
 	targets := make([]*target, len(cfg.Targets))
