@@ -1,5 +1,4 @@
 # ping_exporter
-[![Build Status](https://travis-ci.org/skyxx/ping_exporter.svg)](https://travis-ci.org/skyxx/ping_exporter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skyxx/ping_exporter)](https://goreportcard.com/report/github.com/skyxx/ping_exporter)
 
 Prometheus exporter for ICMP echo requests using https://github.com/digineo/go-ping
