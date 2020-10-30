@@ -9,6 +9,7 @@ EnvironmentFile=/etc/default/prometheus-ping-exporter
 ExecStart=/usr/bin/ping-exporter $ARGS
 NoNewPrivileges=yes
 CapabilityBoundingSet=CAP_NET_RAW
+AmbientCapabilities=CAP_NET_RAW
 PrivateDevices=true
 PrivateTmp=yes
 ProtectControlGroups=true
