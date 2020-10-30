@@ -1,4 +1,4 @@
-module github.com/czerwonk/ping_exporter
+module github.com/skyxx/ping_exporter
 
 go 1.14
 
