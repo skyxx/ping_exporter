@@ -18,10 +18,6 @@ type Config struct {
 		Size     uint16   `yaml:"payload-size"`
 	} `yaml:"ping"`
 
-	DNS struct {
-		Refresh    duration `yaml:"refresh"`
-		Nameserver string   `yaml:"nameserver"`
-	} `yaml:"dns"`
 }
 
 type duration time.Duration
