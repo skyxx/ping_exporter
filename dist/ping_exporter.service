@@ -1,6 +1,5 @@
 [Unit]
 Description=Ping Exporter
-Documentation=https://github.com/czerwonk/ping_exporter
 Wants=network-online.target
 After=network-online.target
 
