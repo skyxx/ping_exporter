@@ -23,11 +23,10 @@ targets:
   - 2001:4860:4860::8844
   - google.com
   
-
 ping:
-  interval: 2s
-  timeout: 3s
-  history-size: 42
+  interval: 1s
+  timeout: 2s
+  history-size: 10
   payload-size: 120
 ```
 
