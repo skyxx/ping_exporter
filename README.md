@@ -11,25 +11,6 @@ For more information check the [source code][go-ping].
 
 ## Getting Started
 
-### Config file
-
-Targets can be specified in a YAML based config file:
-
-```yaml
-targets:
-  - 8.8.8.8
-  - 8.8.4.4
-  - 2001:4860:4860::8888
-  - 2001:4860:4860::8844
-  - google.com
-  
-ping:
-  interval: 1s
-  timeout: 2s
-  history-size: 10
-  payload-size: 120
-```
-
 ### Exported metrics
 
 - `ping_rtt_best_ms`:          Best round trip time in millis
@@ -47,6 +28,43 @@ name).
 Additionally, a `ping_up` metric reports whether the exporter
 is running (and in which version).
 
+
+### Config
+
+#### Exporter config
+Targets can be specified in a YAML based config file (/etc/prometheus/ping-exporter.yml):
+
+```yaml
+targets:
+  - 8.8.8.8
+  - 8.8.4.4
+  - 2001:4860:4860::8888
+  - 2001:4860:4860::8844
+  - google.com
+  
+ping:
+  interval: 1s
+  timeout: 2s
+  history-size: 10
+  payload-size: 120
+```
+#### Defaults for systemd service
+Defaults config in /etc/default/prometheus-ping-exporter
+
+```console
+ARGS='--web.listen-address="127.0.0.1:9427" --config.path=/etc/prometheus/ping-exporter.yml'
+```
+#### Prometheus config
+Add scrape job in to prometheus yaml comfiguration (/etc/prometheus/prometheus.yaml)
+
+```yaml
+scrape_configs:
+  - job_name: 'ping'
+    scrape_interval: 10s
+    scrape_timeout: 3s
+    static_configs:
+      - targets: ['127.0.0.1:9427']
+```
 
 ### Shell
 
