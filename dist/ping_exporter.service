@@ -1,10 +1,13 @@
 [Unit]
 Description=Ping Exporter
-After=network.target
+Documentation=https://github.com/czerwonk/ping_exporter
+Wants=network-online.target
+After=network-online.target
 
 [Service]
-User=ping_exporter
-ExecStart=/usr/local/bin/ping_exporter --config.path=/etc/ping_exporter/config.yml
+User=prometheus
+EnvironmentFile=/etc/default/prometheus-ping-exporter
+ExecStart=/usr/bin/ping-exporter $ARGS
 NoNewPrivileges=yes
 CapabilityBoundingSet=CAP_NET_RAW
 PrivateDevices=true
@@ -22,6 +25,10 @@ RestrictRealtime=yes
 RestrictSUIDSGID=yes
 MemoryDenyWriteExecute=yes
 LockPersonality=yes
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+TimeoutStopSec=10s
+SendSIGKILL=no
 
 [Install]
 WantedBy=default.target
