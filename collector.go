@@ -52,14 +52,12 @@ func (p *pingCollector) Collect(ch chan<- prometheus.Metric) {
 	for target, metrics := range p.metrics {
 		l := strings.SplitN(target, " ", 3)
 
-		if metrics.PacketsSent > metrics.PacketsLost {
-			ch <- prometheus.MustNewConstMetric(sentDesc, prometheus.GaugeValue, float64(metrics.PacketsSent), l...)
-			ch <- prometheus.MustNewConstMetric(lossDesc, prometheus.GaugeValue, float64(metrics.PacketsLost), l...)
-			ch <- prometheus.MustNewConstMetric(bestDesc, prometheus.GaugeValue, float64(metrics.Best), l...)
-			ch <- prometheus.MustNewConstMetric(worstDesc, prometheus.GaugeValue, float64(metrics.Worst), l...)
-			ch <- prometheus.MustNewConstMetric(medianDesc, prometheus.GaugeValue, float64(metrics.Median), l...)
-			ch <- prometheus.MustNewConstMetric(meanDesc, prometheus.GaugeValue, float64(metrics.Mean), l...)
-			ch <- prometheus.MustNewConstMetric(stddevDesc, prometheus.GaugeValue, float64(metrics.StdDev), l...)
-		}
+		ch <- prometheus.MustNewConstMetric(sentDesc, prometheus.GaugeValue, float64(metrics.PacketsSent), l...)
+		ch <- prometheus.MustNewConstMetric(lossDesc, prometheus.GaugeValue, float64(metrics.PacketsLost), l...)
+		ch <- prometheus.MustNewConstMetric(bestDesc, prometheus.GaugeValue, float64(metrics.Best), l...)
+		ch <- prometheus.MustNewConstMetric(worstDesc, prometheus.GaugeValue, float64(metrics.Worst), l...)
+		ch <- prometheus.MustNewConstMetric(medianDesc, prometheus.GaugeValue, float64(metrics.Median), l...)
+		ch <- prometheus.MustNewConstMetric(meanDesc, prometheus.GaugeValue, float64(metrics.Mean), l...)
+		ch <- prometheus.MustNewConstMetric(stddevDesc, prometheus.GaugeValue, float64(metrics.StdDev), l...)
 	}
 }
